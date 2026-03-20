@@ -1,0 +1,831 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Test de Personalidad — Superhéroes</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --surface: #12121a;
+    --surface2: #1a1a26;
+    --border: rgba(255,255,255,0.07);
+    --text: #f0eeff;
+    --muted: rgba(240,238,255,0.45);
+    --accent: #c8b8ff;
+    --gold: #f5c842;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Animated BG */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 60% 50% at 20% 10%, rgba(120,80,255,0.12) 0%, transparent 60%),
+      radial-gradient(ellipse 50% 40% at 80% 90%, rgba(255,80,120,0.08) 0%, transparent 60%),
+      radial-gradient(ellipse 40% 60% at 90% 20%, rgba(80,200,255,0.06) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* Stars */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      radial-gradient(circle, rgba(255,255,255,0.6) 1px, transparent 1px),
+      radial-gradient(circle, rgba(255,255,255,0.4) 1px, transparent 1px),
+      radial-gradient(circle, rgba(255,255,255,0.3) 1px, transparent 1px);
+    background-size: 300px 300px, 200px 200px, 400px 400px;
+    background-position: 0 0, 150px 100px, 50px 200px;
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.3;
+  }
+
+  .app {
+    position: relative;
+    z-index: 1;
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 3rem 1.5rem 4rem;
+  }
+
+  /* HEADER */
+  .header {
+    text-align: center;
+    margin-bottom: 3rem;
+    animation: fadeUp 0.8s ease both;
+  }
+
+  .header-tag {
+    display: inline-block;
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--accent);
+    border: 1px solid rgba(200,184,255,0.3);
+    padding: 6px 16px;
+    border-radius: 100px;
+    margin-bottom: 1.25rem;
+  }
+
+  .header h1 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(52px, 10vw, 90px);
+    line-height: 0.9;
+    letter-spacing: 2px;
+    background: linear-gradient(135deg, #ffffff 0%, #c8b8ff 40%, #ff8ab0 80%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 1rem;
+  }
+
+  .header p {
+    font-size: 16px;
+    color: var(--muted);
+    font-weight: 300;
+    line-height: 1.7;
+    max-width: 420px;
+    margin: 0 auto;
+  }
+
+  /* HERO LINEUP (intro) */
+  .hero-lineup {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin: 2rem 0;
+    flex-wrap: wrap;
+  }
+
+  .hero-chip {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 100px;
+    padding: 8px 16px 8px 10px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text);
+    transition: border-color 0.2s;
+  }
+
+  .hero-chip:hover { border-color: rgba(255,255,255,0.2); }
+
+  .hero-chip .dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+  }
+
+  /* CARDS */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 2rem 2.25rem;
+    animation: fadeUp 0.5s ease both;
+  }
+
+  /* PROGRESS */
+  .progress-wrap {
+    margin-bottom: 2rem;
+  }
+
+  .progress-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+
+  .progress-label {
+    font-size: 12px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .progress-count {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 20px;
+    color: var(--accent);
+    letter-spacing: 1px;
+  }
+
+  .progress-track {
+    height: 3px;
+    background: var(--border);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #7f5af0, #c8b8ff);
+    border-radius: 2px;
+    transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* QUESTION */
+  .question-text {
+    font-size: 22px;
+    font-weight: 500;
+    line-height: 1.4;
+    margin-bottom: 1.75rem;
+    color: var(--text);
+  }
+
+  /* OPTIONS */
+  .options {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .option {
+    position: relative;
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 14px 18px;
+    text-align: left;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    font-weight: 300;
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    overflow: hidden;
+  }
+
+  .option::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(127,90,240,0.08), rgba(200,184,255,0.04));
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+
+  .option:hover {
+    border-color: rgba(200,184,255,0.35);
+    color: var(--text);
+  }
+
+  .option:hover::before { opacity: 1; }
+
+  .option.selected {
+    border-color: rgba(200,184,255,0.6);
+    color: var(--text);
+    background: rgba(127,90,240,0.12);
+  }
+
+  .option.selected::before { opacity: 1; }
+
+  .option-bullet {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    border: 1.5px solid rgba(200,184,255,0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: all 0.2s;
+  }
+
+  .option.selected .option-bullet {
+    background: #7f5af0;
+    border-color: #7f5af0;
+  }
+
+  .option-bullet-inner {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: white;
+    opacity: 0;
+    transform: scale(0);
+    transition: all 0.2s;
+  }
+
+  .option.selected .option-bullet-inner {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  /* NAV */
+  .nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 1.75rem;
+  }
+
+  .btn {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    padding: 11px 24px;
+    border-radius: 100px;
+    cursor: pointer;
+    transition: all 0.2s;
+    letter-spacing: 0.3px;
+  }
+
+  .btn-ghost {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--muted);
+  }
+
+  .btn-ghost:hover:not(:disabled) {
+    border-color: rgba(255,255,255,0.2);
+    color: var(--text);
+  }
+
+  .btn-primary {
+    background: linear-gradient(135deg, #7f5af0, #c8b8ff);
+    border: none;
+    color: #0a0a0f;
+    font-weight: 500;
+    padding: 11px 28px;
+  }
+
+  .btn-primary:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 8px 24px rgba(127,90,240,0.35);
+  }
+
+  .btn-primary:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+  }
+
+  .btn-ghost:disabled {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  /* RESULT */
+  .result-hero-banner {
+    position: relative;
+    border-radius: 20px;
+    overflow: hidden;
+    padding: 2.5rem 2.25rem 2rem;
+    margin-bottom: 1.5rem;
+    text-align: center;
+  }
+
+  .result-hero-bg {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+  }
+
+  .result-hero-content {
+    position: relative;
+    z-index: 1;
+  }
+
+  .result-emblem {
+    font-size: 64px;
+    line-height: 1;
+    margin-bottom: 1rem;
+    display: block;
+    filter: drop-shadow(0 0 30px rgba(255,255,255,0.2));
+  }
+
+  .result-universe-badge {
+    display: inline-block;
+    font-size: 10px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    padding: 5px 14px;
+    border-radius: 100px;
+    margin-bottom: 0.75rem;
+    font-weight: 500;
+  }
+
+  .result-name {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 72px;
+    line-height: 0.9;
+    letter-spacing: 3px;
+    margin-bottom: 1rem;
+  }
+
+  .result-tagline {
+    font-size: 15px;
+    font-weight: 300;
+    line-height: 1.7;
+    max-width: 460px;
+    margin: 0 auto;
+  }
+
+  /* Traits */
+  .traits-section {
+    margin-bottom: 1.5rem;
+  }
+
+  .section-label {
+    font-size: 10px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 12px;
+  }
+
+  .traits {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .trait {
+    font-size: 13px;
+    font-weight: 400;
+    padding: 6px 14px;
+    border-radius: 100px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--text);
+  }
+
+  /* Score bars */
+  .scores-section { }
+
+  .score-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+
+  .score-hero-name {
+    font-size: 13px;
+    font-weight: 400;
+    color: var(--muted);
+    min-width: 110px;
+  }
+
+  .score-track {
+    flex: 1;
+    height: 5px;
+    background: rgba(255,255,255,0.06);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+
+  .score-bar {
+    height: 100%;
+    border-radius: 3px;
+    transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
+    width: 0%;
+  }
+
+  .score-pts {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 18px;
+    color: var(--muted);
+    min-width: 28px;
+    text-align: right;
+  }
+
+  /* Divider */
+  .divider {
+    height: 1px;
+    background: var(--border);
+    margin: 1.5rem 0;
+  }
+
+  .btn-restart {
+    display: block;
+    width: 100%;
+    text-align: center;
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 100px;
+    padding: 13px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-top: 1.25rem;
+  }
+
+  .btn-restart:hover {
+    border-color: rgba(255,255,255,0.2);
+    color: var(--text);
+  }
+
+  /* Animations */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes popIn {
+    from { opacity: 0; transform: scale(0.9); }
+    to { opacity: 1; transform: scale(1); }
+  }
+
+  .anim-pop { animation: popIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both; }
+
+  /* Intro start button */
+  .start-btn-wrap { text-align: center; margin-top: 2.5rem; }
+
+  .btn-start {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 22px;
+    letter-spacing: 3px;
+    background: linear-gradient(135deg, #7f5af0, #c8b8ff);
+    border: none;
+    color: #0a0a0f;
+    padding: 16px 52px;
+    border-radius: 100px;
+    cursor: pointer;
+    transition: all 0.25s;
+  }
+
+  .btn-start:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 36px rgba(127,90,240,0.4);
+  }
+
+  /* Hidden */
+  .hidden { display: none; }
+
+  @media (max-width: 500px) {
+    .card { padding: 1.5rem 1.25rem; }
+    .question-text { font-size: 18px; }
+    .result-name { font-size: 52px; }
+    .header h1 { font-size: 58px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="app" id="app"></div>
+
+<script>
+const questions = [
+  {
+    text: "¿Cómo prefieres resolver un problema difícil?",
+    options: [
+      { text: "Con inteligencia y planeación meticulosa", scores: { batman: 3, ironman: 2, flash: 0, wonder: 1 } },
+      { text: "Con tecnología y recursos avanzados", scores: { batman: 1, ironman: 3, flash: 0, wonder: 1 } },
+      { text: "Directo al frente con fuerza y valentía", scores: { batman: 0, ironman: 0, flash: 1, wonder: 3 } },
+      { text: "Rápido y de manera espontánea", scores: { batman: 0, ironman: 1, flash: 3, wonder: 0 } }
+    ]
+  },
+  {
+    text: "¿Cuál es tu mayor motivación para hacer el bien?",
+    options: [
+      { text: "Proteger a los inocentes de tragedias como la que yo viví", scores: { batman: 3, ironman: 0, flash: 1, wonder: 1 } },
+      { text: "Expiar mis errores del pasado y demostrar que cambié", scores: { batman: 1, ironman: 3, flash: 0, wonder: 0 } },
+      { text: "El sentido del deber y la justicia desde mi formación", scores: { batman: 0, ironman: 0, flash: 1, wonder: 3 } },
+      { text: "Ayudar a la gente porque simplemente es lo correcto", scores: { batman: 0, ironman: 1, flash: 3, wonder: 1 } }
+    ]
+  },
+  {
+    text: "¿Cómo eres en situaciones de presión extrema?",
+    options: [
+      { text: "Calculado y frío — las emociones son un lujo peligroso", scores: { batman: 3, ironman: 1, flash: 0, wonder: 0 } },
+      { text: "Confiado en mi genialidad para improvisar algo", scores: { batman: 0, ironman: 3, flash: 1, wonder: 0 } },
+      { text: "Me guío por mis valores aunque sea difícil", scores: { batman: 0, ironman: 0, flash: 1, wonder: 3 } },
+      { text: "Actúo sin pensarlo demasiado — la velocidad es clave", scores: { batman: 0, ironman: 1, flash: 3, wonder: 0 } }
+    ]
+  },
+  {
+    text: "¿Cómo te relacionas con los demás?",
+    options: [
+      { text: "Soy reservado — pocos me conocen realmente", scores: { batman: 3, ironman: 0, flash: 0, wonder: 1 } },
+      { text: "Carismático pero me cuesta depender de otros", scores: { batman: 0, ironman: 3, flash: 1, wonder: 0 } },
+      { text: "Profundamente empático y siempre dispuesto a escuchar", scores: { batman: 0, ironman: 0, flash: 1, wonder: 3 } },
+      { text: "Amigable y sociable — los amigos son mi fuerza", scores: { batman: 0, ironman: 1, flash: 3, wonder: 0 } }
+    ]
+  },
+  {
+    text: "¿Qué valor defenderías por encima de todo?",
+    options: [
+      { text: "La justicia, aunque tenga que ir solo contra el mundo", scores: { batman: 3, ironman: 1, flash: 0, wonder: 1 } },
+      { text: "La innovación — el futuro depende de avanzar", scores: { batman: 0, ironman: 3, flash: 0, wonder: 0 } },
+      { text: "La paz y la dignidad de cada ser humano", scores: { batman: 0, ironman: 0, flash: 0, wonder: 3 } },
+      { text: "La libertad de todos para vivir sin miedo", scores: { batman: 1, ironman: 1, flash: 3, wonder: 1 } }
+    ]
+  },
+  {
+    text: "¿Cuál es tu mayor debilidad?",
+    options: [
+      { text: "La obsesión — a veces voy demasiado lejos en mi misión", scores: { batman: 3, ironman: 1, flash: 0, wonder: 0 } },
+      { text: "El ego — me cuesta admitir que necesito ayuda", scores: { batman: 0, ironman: 3, flash: 0, wonder: 0 } },
+      { text: "La impulsividad — actúo antes de pensar", scores: { batman: 0, ironman: 0, flash: 3, wonder: 1 } },
+      { text: "Confiar demasiado en las personas — soy muy crédulo/a", scores: { batman: 0, ironman: 0, flash: 1, wonder: 3 } }
+    ]
+  },
+  {
+    text: "¿Cómo te ves a ti mismo/a en un equipo?",
+    options: [
+      { text: "El estratega que define el plan desde las sombras", scores: { batman: 3, ironman: 1, flash: 0, wonder: 0 } },
+      { text: "El líder brillante con los mejores recursos del grupo", scores: { batman: 0, ironman: 3, flash: 0, wonder: 1 } },
+      { text: "El corazón moral que inspira a todos a dar lo mejor", scores: { batman: 0, ironman: 0, flash: 0, wonder: 3 } },
+      { text: "El que llega justo a tiempo para salvar el día", scores: { batman: 0, ironman: 0, flash: 3, wonder: 0 } }
+    ]
+  },
+  {
+    text: "¿Qué entorno te resulta más inspirador?",
+    options: [
+      { text: "La noche, la soledad y los misterios sin resolver", scores: { batman: 3, ironman: 0, flash: 0, wonder: 0 } },
+      { text: "Un laboratorio lleno de tecnología de punta", scores: { batman: 1, ironman: 3, flash: 1, wonder: 0 } },
+      { text: "La naturaleza, el mar o lugares llenos de historia", scores: { batman: 0, ironman: 0, flash: 0, wonder: 3 } },
+      { text: "Una ciudad viva y llena de gente que proteger", scores: { batman: 1, ironman: 1, flash: 3, wonder: 1 } }
+    ]
+  }
+];
+
+const heroes = {
+  batman: {
+    name: "Batman",
+    universe: "DC",
+    emoji: "🦇",
+    color: "#a0a0c0",
+    accentGrad: "linear-gradient(135deg, #1a1a2e, #2d2d5e, #1a1a2e)",
+    barColor: "#8888cc",
+    badgeBg: "rgba(160,160,200,0.15)",
+    badgeColor: "#c0c0e8",
+    glow: "rgba(100,100,200,0.3)",
+    nameColor: "#ffffff",
+    desc: "Eres el Caballero de la Noche. Calculado, solitario y movido por un sentido de justicia inquebrantable. Tu mayor fortaleza es tu mente y tu disciplina de hierro. No necesitas superpoderes — eres tú mismo tu arma más poderosa.",
+    traits: ["Estratega nato", "Disciplinado", "Reservado", "Detectivesco", "Implacable"]
+  },
+  ironman: {
+    name: "Iron Man",
+    universe: "Marvel",
+    emoji: "🔴",
+    color: "#ff6b4a",
+    accentGrad: "linear-gradient(135deg, #2a0a00, #5c1a00, #2a0a00)",
+    barColor: "#ff6b4a",
+    badgeBg: "rgba(255,107,74,0.15)",
+    badgeColor: "#ffaa88",
+    glow: "rgba(255,80,40,0.3)",
+    nameColor: "#ffddcc",
+    desc: "Eres Tony Stark. Brillante, carismático y con un ego que iguala tu genio. Convertiste tus errores en tu mayor motivación. Confías en la tecnología y en ti mismo — a veces demasiado — pero cuando te propones algo, nada te detiene.",
+    traits: ["Genio", "Innovador", "Carismático", "Visionario", "Arrogante pero noble"]
+  },
+  wonder: {
+    name: "Wonder Woman",
+    universe: "DC",
+    emoji: "⚡",
+    color: "#f5c842",
+    accentGrad: "linear-gradient(135deg, #1a1400, #3d2e00, #1a1400)",
+    barColor: "#f5c842",
+    badgeBg: "rgba(245,200,66,0.15)",
+    badgeColor: "#f5d880",
+    glow: "rgba(245,200,66,0.3)",
+    nameColor: "#fff5cc",
+    desc: "Eres Diana de Temiscira. Guiada por la compasión, el deber y una fe inquebrantable en la humanidad. Tu fuerza no solo es física — viene de tus valores profundos. Eres el corazón moral de cualquier equipo.",
+    traits: ["Compasiva", "Valiente", "Honesta", "Líder natural", "Empática"]
+  },
+  flash: {
+    name: "The Flash",
+    universe: "DC",
+    emoji: "⚡",
+    color: "#ffaa00",
+    accentGrad: "linear-gradient(135deg, #1a0e00, #3d2800, #1a0e00)",
+    barColor: "#ffaa00",
+    badgeBg: "rgba(255,170,0,0.15)",
+    badgeColor: "#ffd066",
+    glow: "rgba(255,150,0,0.3)",
+    nameColor: "#ffeecc",
+    desc: "Eres Barry Allen. Veloz, espontáneo y con un corazón enorme. No llegas siempre con el plan perfecto — pero siempre llegas justo a tiempo. Tu optimismo y tu conexión con la gente son tu mayor superpoder.",
+    traits: ["Optimista", "Veloz de mente", "Empático", "Impulsivo", "Leal"]
+  }
+};
+
+const scoreKeys = ["batman", "ironman", "wonder", "flash"];
+
+let phase = "intro";
+let current = 0;
+let answers = Array(questions.length).fill(null);
+let scores = {};
+
+function render() {
+  const app = document.getElementById("app");
+  if (phase === "intro") app.innerHTML = introHTML();
+  else if (phase === "quiz") app.innerHTML = quizHTML();
+  else app.innerHTML = resultHTML();
+  attachEvents();
+  if (phase === "result") setTimeout(animateBars, 100);
+}
+
+function introHTML() {
+  return `
+    <div class="header">
+      <div class="header-tag">Test de Personalidad</div>
+      <h1>¿Qué<br>Superhéroe<br>Eres?</h1>
+      <p>8 preguntas revelarán con qué héroe compartes alma. Sin poderes, solo personalidad.</p>
+    </div>
+    <div class="hero-lineup">
+      <div class="hero-chip"><div class="dot" style="background:#8888cc"></div>Batman · DC</div>
+      <div class="hero-chip"><div class="dot" style="background:#ff6b4a"></div>Iron Man · Marvel</div>
+      <div class="hero-chip"><div class="dot" style="background:#f5c842"></div>Wonder Woman · DC</div>
+      <div class="hero-chip"><div class="dot" style="background:#ffaa00"></div>The Flash · DC</div>
+    </div>
+    <div class="start-btn-wrap">
+      <button class="btn-start" id="startBtn">COMENZAR →</button>
+    </div>`;
+}
+
+function quizHTML() {
+  const q = questions[current];
+  const pct = Math.round((current / questions.length) * 100);
+  const answered = answers.filter(a => a !== null).length;
+  return `
+    <div style="animation: fadeUp 0.4s ease both;">
+      <div class="progress-wrap">
+        <div class="progress-meta">
+          <span class="progress-label">Progreso</span>
+          <span class="progress-count">${current + 1} / ${questions.length}</span>
+        </div>
+        <div class="progress-track">
+          <div class="progress-fill" style="width: ${pct}%"></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="question-text">${q.text}</div>
+        <div class="options">
+          ${q.options.map((o, i) => `
+            <button class="option ${answers[current] === i ? 'selected' : ''}" data-idx="${i}">
+              <div class="option-bullet">
+                <div class="option-bullet-inner"></div>
+              </div>
+              ${o.text}
+            </button>`).join('')}
+        </div>
+        <div class="nav">
+          <button class="btn btn-ghost" id="prevBtn" ${current === 0 ? 'disabled' : ''}>← Anterior</button>
+          ${current < questions.length - 1
+            ? `<button class="btn btn-primary" id="nextBtn" ${answers[current] === null ? 'disabled' : ''}>Siguiente →</button>`
+            : `<button class="btn btn-primary" id="finishBtn" ${answers[current] === null ? 'disabled' : ''}>Ver mi resultado →</button>`
+          }
+        </div>
+      </div>
+    </div>`;
+}
+
+function resultHTML() {
+  const winner = scoreKeys.reduce((a, b) => scores[a] >= scores[b] ? a : b);
+  const h = heroes[winner];
+  const maxScore = Math.max(...scoreKeys.map(k => scores[k]));
+  return `
+    <div style="animation: fadeUp 0.5s ease both;">
+      <div class="result-hero-banner" style="background: ${h.accentGrad}; box-shadow: 0 0 60px ${h.glow};">
+        <div class="result-hero-content">
+          <span class="result-universe-badge" style="background: ${h.badgeBg}; color: ${h.badgeColor}; border: 1px solid ${h.badgeColor}30;">${h.universe} · UNIVERSO</span>
+          <span class="result-emblem">${h.emoji}</span>
+          <div class="result-name" style="color: ${h.nameColor}">${h.name}</div>
+          <p class="result-tagline" style="color: rgba(255,255,255,0.55)">${h.desc}</p>
+        </div>
+      </div>
+
+      <div class="card" style="animation-delay: 0.1s;">
+        <div class="traits-section">
+          <div class="section-label">Tus rasgos principales</div>
+          <div class="traits">
+            ${h.traits.map(t => `<span class="trait">${t}</span>`).join('')}
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="scores-section">
+          <div class="section-label">Afinidad con cada héroe</div>
+          ${scoreKeys.map(k => `
+            <div class="score-row">
+              <span class="score-hero-name">${heroes[k].name}</span>
+              <div class="score-track">
+                <div class="score-bar" id="bar-${k}" style="background: ${heroes[k].barColor}; width: 0%"></div>
+              </div>
+              <span class="score-pts">${scores[k]}</span>
+            </div>`).join('')}
+        </div>
+
+        <button class="btn-restart" id="restartBtn">Hacer el test de nuevo</button>
+      </div>
+    </div>`;
+}
+
+function animateBars() {
+  const maxScore = Math.max(...scoreKeys.map(k => scores[k]));
+  scoreKeys.forEach(k => {
+    const bar = document.getElementById("bar-" + k);
+    if (bar && maxScore > 0) {
+      bar.style.width = Math.round((scores[k] / maxScore) * 100) + "%";
+    }
+  });
+}
+
+function attachEvents() {
+  const startBtn = document.getElementById("startBtn");
+  if (startBtn) startBtn.addEventListener("click", () => { phase = "quiz"; current = 0; answers = Array(questions.length).fill(null); render(); });
+
+  document.querySelectorAll(".option").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const idx = parseInt(btn.dataset.idx);
+      answers[current] = idx;
+      render();
+    });
+  });
+
+  const prevBtn = document.getElementById("prevBtn");
+  if (prevBtn) prevBtn.addEventListener("click", () => { if (current > 0) { current--; render(); } });
+
+  const nextBtn = document.getElementById("nextBtn");
+  if (nextBtn) nextBtn.addEventListener("click", () => { if (answers[current] !== null) { current++; render(); } });
+
+  const finishBtn = document.getElementById("finishBtn");
+  if (finishBtn) finishBtn.addEventListener("click", () => {
+    scores = { batman: 0, ironman: 0, wonder: 0, flash: 0 };
+    questions.forEach((q, qi) => {
+      if (answers[qi] !== null) {
+        const s = q.options[answers[qi]].scores;
+        scoreKeys.forEach(k => scores[k] += s[k]);
+      }
+    });
+    phase = "result";
+    render();
+  });
+
+  const restartBtn = document.getElementById("restartBtn");
+  if (restartBtn) restartBtn.addEventListener("click", () => { phase = "intro"; render(); });
+}
+
+render();
+</script>
+</body>
+</html>
